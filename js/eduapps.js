@@ -12,8 +12,7 @@ window.EduApps = {
       sidebarToggle.addEventListener("click", (event) => {
         event.preventDefault();
         document.body.classList.toggle("sb-sidenav-toggled");
-        localStorage.setItem(
-          "sb|sidebar-toggle",
+        localStorage.setItem("sb|sidebar-toggle",
           document.body.classList.contains("sb-sidenav-toggled")
         );
       });
@@ -23,9 +22,9 @@ window.EduApps = {
     if (darkModeSwitch) {
       darkModeSwitch.addEventListener("click", (event) => {
         if (darkModeSwitch.checked) {
-            setTheme("dark");
+            this.setTheme("dark");
         } else {
-            setTheme("light");
+            this.setTheme("light");
         }
       });
     }
@@ -37,21 +36,21 @@ window.EduApps = {
         
         if (window.matchMedia) {
             if(window.matchMedia('(prefers-color-scheme: dark)').matches){
-                setTheme("dark");
+                this.setTheme("dark");
             } else {
                 darkModeSwitch.checked = false;
-                setTheme("light");
+                this.setTheme("light");
             }
         } else {
             //default
-            setTheme("dark");
+            this.setTheme("dark");
         }
     }else{
         const savedTheme = localStorage.getItem("theme");
         if(savedTheme === "light"){
             darkModeSwitch.checked = false;
         }
-        setTheme(savedTheme);
+        this.setTheme(savedTheme);
     }
   },
   // Set the theme and save the preference in localStorage
