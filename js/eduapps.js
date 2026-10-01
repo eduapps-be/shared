@@ -1,8 +1,11 @@
 window.EduApps = {
   init() {
-    const sidebarToggle = document.body.querySelector("#sidebarToggle");
-    const darkModeSwitch = document.querySelector("#darkModeSwitch");
+    this.initSidebar();
+    this.initTheme();
+  },
 
+  initSidebar(){
+    const sidebarToggle = document.body.querySelector("#sidebarToggle");
     // Toggle the side navigation
     if (sidebarToggle) {
       // Uncomment Below to persist sidebar toggle between refreshes
@@ -17,7 +20,10 @@ window.EduApps = {
         );
       });
     }
+  },
 
+  initTheme(){
+    const darkModeSwitch = document.querySelector("#darkModeSwitch");
     // Toggle the dark mode
     if (darkModeSwitch) {
       darkModeSwitch.addEventListener("click", (event) => {
@@ -28,12 +34,9 @@ window.EduApps = {
         }
       });
     }
-  },
-  // Initialize the theme based on user preference or system settings
-  initTheme() {
-    const darkModeSwitch = document.querySelector("#darkModeSwitch");
+
+    // Set the initial theme based on user preference or system settings
     if(localStorage.getItem("theme") === null){
-        
         if (window.matchMedia) {
             if(window.matchMedia('(prefers-color-scheme: dark)').matches){
                 this.setTheme("dark");
@@ -53,11 +56,13 @@ window.EduApps = {
         this.setTheme(savedTheme);
     }
   },
+
   // Set the theme and save the preference in localStorage
   setTheme(theme){
     document.body.dataset.bsTheme = theme;
-    localStorage.setItem("theme", theme);   
+    localStorage.setItem("theme", theme); 
   },
+
   /*
   const liveToastBtn = document.querySelector('#liveToastBtn');
   const message = "Dit is een bericht voor de toast";
@@ -106,5 +111,23 @@ window.EduApps = {
     toatsContainer.insertAdjacentHTML('beforeend', newToast);
     const bsToast = new bootstrap.Toast(toatsContainer.lastChild);
     bsToast.show();
+  },
+
+  async fetchData(url, method = "GET", data = null) {
+    const options = {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    if (data) {
+      options.body = JSON.stringify(data);
+    }
+    const result = await fetch(url, options);
+
+    if (!result.ok) {
+      throw new Error(`HTTP error! status: ${result.status}`);
+    }
+    return result.json();
   }
 };
