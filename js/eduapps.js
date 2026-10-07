@@ -114,20 +114,60 @@ window.EduApps = {
   },
 
   async fetchData(url, method = "GET", data = null) {
+    method = method.toUpperCase();
+
     const options = {
-      method: method,
+      method,
+      credentials: "same-origin",            // cookie meesturen (standaard bij same-origin, maar expliciet is duidelijker)
       headers: {
-        "Content-Type": "application/json",
+        "Accept": "application/json",
       },
     };
-    if (data) {
+
+    if (data !== null) {
+      options.headers["Content-Type"] = "application/json";
       options.body = JSON.stringify(data);
     }
+
+    // CSRF-token enkel bij wijzigende requests
+    if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
+      const token = document.querySelector('meta[name="csrf-token"]')?.content;
+      if (token) {
+        options.headers["X-CSRF-Token"] = token;
+      }
+    }
+
     const result = await fetch(url, options);
 
-    if (!result.ok) {
-      throw new Error(`HTTP error! status: ${result.status}`);
+    if (result.status === 401) {
+      // Sessie verlopen: naar de loginpagina, met terugkeer naar de huidige pagina
+      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+      if (loginModal){
+        loginModal.show();
+      }else{
+        const returnTo = encodeURIComponent(location.pathname + location.search);
+        window.location.href = `/eduapps/core/public/login/?return=${returnTo}`;
+      }
+      loginModal.show();
+      throw new Error("Session expired");
     }
+
+    if (!result.ok) {
+      // Probeer de foutmelding van de API te lezen ({"error": "..."})
+      let message = `HTTP error! status: ${result.status}`;
+      try {
+        const body = await result.json();
+        if (body.error) message = body.error;
+      } catch (_) { /* geen JSON in de response */ }
+
+      const error = new Error(message);
+      error.status = result.status;
+      throw error;
+    }
+
+    // 204 No Content (bv. na een DELETE) heeft geen body
+    if (result.status === 204) return null;
+
     return result.json();
   }
 };
