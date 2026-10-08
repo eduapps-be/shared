@@ -1,3 +1,8 @@
+.btn-smartschool {
+    border: 1px solid #ff520e !important;
+    background-color: #ff520e !important;
+}
+
 .navbar-nav .nav-item a img,
 .navbar-nav .nav-item a svg{
     height: 15px;
